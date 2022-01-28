@@ -1,13 +1,18 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
-import App from "./App";
+// import App from "./App";
+import AppRouter from "./routes";
+import { SWRConfig } from "swr";
 
+const cacheMap = new Map();
+// @ts-ignore
+window.cacheMap = cacheMap;
 ReactDOM.render(
-  <React.StrictMode>
+  <SWRConfig value={{ provider: () => cacheMap }}>
     <BrowserRouter>
-      <App />
+      <AppRouter />
     </BrowserRouter>
-  </React.StrictMode>,
+  </SWRConfig>,
   document.getElementById("root")
 );

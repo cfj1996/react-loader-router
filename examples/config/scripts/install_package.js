@@ -9,6 +9,7 @@ let installDir = path.resolve(__dirname, "../node_modules");
 async function run() {
   // Install all remix packages
   await fs.ensureDir(installDir);
+  await fs.emptyDir(`${installDir}/react-loader-router`);
   await fs.copy(buildDir, installDir);
 }
 

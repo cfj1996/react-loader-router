@@ -37,6 +37,7 @@ function reactLoaderRoute() {
     plugins: [
       babel({
         exclude: /node_modules/,
+        babelHelpers: "bundled",
         presets: [
           ["@babel/preset-env", { loose: true }],
           "@babel/preset-react",
@@ -68,6 +69,7 @@ function reactLoaderRoute() {
     plugins: [
       babel({
         exclude: /node_modules/,
+        babelHelpers: "bundled",
         presets: [
           ["@babel/preset-env", { loose: true }],
           "@babel/preset-react",
