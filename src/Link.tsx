@@ -8,10 +8,10 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function (
   ref
 ) {
   const { prefetch, target = "hover", ...other } = props;
-  const fetch = usePrefetch(other.to);
+  const fetch = usePrefetch();
   React.useEffect(() => {
     if (target === "auto") {
-      prefetch && fetch();
+      prefetch && fetch(other.to);
     }
   }, []);
   return (
@@ -21,7 +21,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function (
       onMouseOver={
         target === "hover"
           ? () => {
-              prefetch && fetch();
+              prefetch && fetch(other.to);
             }
           : undefined
       }

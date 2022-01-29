@@ -1,30 +1,46 @@
-import useSWR from "swr";
-import { LoaderParams, useGetRoutes, useRouteOption } from "./useRoutes";
-import { matchPath, matchRoutes, useLocation } from "react-router-dom";
+import useSWR, {
+  SWRConfiguration,
+  unstable_serialize,
+  useSWRConfig
+} from "swr";
+import { LoaderParams, useRouteMap, useRouteOption } from "./useRoutes";
+import { matchPath, useLocation, useParams } from "react-router-dom";
 
-export const useLoaderData = function () {
+export const useLoaderData = function (config?: SWRConfiguration) {
+  const params = useParams();
+  const { cache } = useSWRConfig();
   const routerOption = useRouteOption();
-  const routes = useGetRoutes();
   const location = useLocation();
-  const matches = matchRoutes(routes, location) || [];
   const matchParams = matchPath(routerOption.absPath, location.pathname);
-  const loaderParams: LoaderParams = {
-    params: matchParams ? matchParams.params : undefined,
-    searchString:
-      location.search &&
-      matches.length &&
-      matches[matches.length - 1].route === routerOption
-        ? location.search
-        : undefined
-  };
+  console.log("matchParams", matchParams);
+  const routeMap = useRouteMap();
+  console.log("routerOption", routerOption);
+  console.log("/user----", matchPath("/user/:id", "/user/2/list"));
+  let loaderParams: LoaderParams | undefined = undefined;
+  if (Object.keys(params).length || (location.search && matchParams)) {
+    loaderParams = {};
+    if (Object.keys(params).length) {
+      loaderParams.params = params;
+    }
+    if (location.search && matchParams) {
+      loaderParams.searchString = location.search;
+    }
+  }
+  const key = loaderParams ? [routerOption.id, loaderParams] : routerOption.id;
+  console.log(
+    "swr-key-get",
+    key,
+    [...(cache as Map<string, any>).keys()].includes(unstable_serialize(key))
+  );
   return useSWR(
-    [routerOption.id, loaderParams],
+    key,
     routerOption.loader
-      ? (id: string, params: LoaderParams) => routerOption.loader?.(params)
+      ? (id: string, params?: LoaderParams) => routerOption.loader?.(params)
       : null,
     {
       suspense: true,
-      fallbackData: routerOption.loaderData
+      fallbackData: routeMap.get(routerOption.id)?.loaderData,
+      ...config
     }
   );
 };

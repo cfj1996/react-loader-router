@@ -3,12 +3,13 @@ import RootLayout from "./layouts/root";
 import { loaderLazy, RouteObject, useRoutes } from "../../../src";
 import { getNavs, getUser, getUsers } from "./server";
 import { createSearchParams } from "react-router-dom";
+import { Loading } from "./Loading";
 
 const routes: RouteObject[] = [
   {
     component: RootLayout,
-    async loader(params) {
-      console.log("params1", params);
+    Fallback: Loading,
+    async loader() {
       return await getNavs();
     },
     routers: [
@@ -29,8 +30,9 @@ const routes: RouteObject[] = [
             index: true,
             title: "用户列表",
             component: loaderLazy(() => import("./page/user")),
+            Fallback: Loading,
             async loader(params) {
-              const searchParams = createSearchParams(params.searchString!);
+              const searchParams = createSearchParams(params?.searchString);
               return await getUsers({
                 page: searchParams.get("page") || "1",
                 per_page: searchParams.get("per_page") || "5"
@@ -41,9 +43,9 @@ const routes: RouteObject[] = [
             path: ":id",
             title: "用户详情",
             component: loaderLazy(() => import("./page/userXq")),
+            Fallback: Loading,
             async loader(params) {
-              console.log(params);
-              return await getUser("1");
+              return await getUser(params?.params?.id || "1");
             }
           }
         ]

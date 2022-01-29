@@ -7,12 +7,12 @@ export type LoaderParams = {
   searchString?: string;
   params?: Params;
 };
-export type Loader<T = any> = (params: LoaderParams) => Promise<T>;
+export type Loader<T = any> = (params?: LoaderParams) => Promise<T>;
 export type LoaderComponentType = React.ComponentType & {
   loader?: Loader;
   fetch?: Fetch;
 };
-export type Fetch = () => Promise<{ default: LoaderComponentType }>;
+export type Fetch = () => Promise<{ default: LoaderComponentType } | undefined>;
 export const RouteOptionsContext = React.createContext<null | MainRouteObject>(
   null
 );
@@ -38,16 +38,25 @@ export interface RouteObject<T = any> {
   Fallback?: React.ComponentType;
   FallbackErr?: React.ComponentType;
 }
-
+type RouteMap = Map<
+  string,
+  { asyncComponent?: LoaderComponentType; loaderData?: any }
+>;
+const RouteMapContext = React.createContext<RouteMap | null>(null);
+export const useRouteMap = function () {
+  return React.useContext(RouteMapContext)!;
+};
 export const useRoutes = function (
   routes: RouteObject[],
   locationArg?: Partial<Location> | string
 ) {
-  const mainRoutes = loopRoutes(routes, "$_root", "/");
-  console.log("mainRoutes", mainRoutes);
+  const routeMapRef = React.useRef<RouteMap>(new Map());
+  const mainRoutes = loopRoutes(routes, "_root", "/");
   return (
     <RoutesContext.Provider value={mainRoutes}>
-      {useARoutes(mainRoutes, locationArg)}
+      <RouteMapContext.Provider value={routeMapRef.current}>
+        {useARoutes(mainRoutes, locationArg)}
+      </RouteMapContext.Provider>
     </RoutesContext.Provider>
   );
 };
@@ -57,8 +66,6 @@ export interface MainRouteObject<T = any> extends RouteObject<T> {
   absPath: string;
   isLayout?: boolean;
   parentId: string;
-  loaderData?: T;
-  fetchLoaderData?: Loader<T>;
   children?: MainRouteObject<T>[];
   element?: React.ReactNode;
   asyncComponent?: LoaderComponentType;
@@ -77,7 +84,7 @@ function loopRoutes(
       id = resolvePath("./", parentId).pathname;
     } else {
       if (route.index) {
-        id = resolvePath("$_index", parentId).pathname;
+        id = resolvePath("_index", parentId).pathname;
       } else {
         id = resolvePath(route.path!, parentId).pathname;
       }
@@ -89,53 +96,47 @@ function loopRoutes(
       absPath,
       isLayout,
       parentId,
+      element: route.component ? (
+        <RouteComponent
+          {...route}
+          id={id}
+          absPath={absPath}
+          isLayout={isLayout}
+          parentId={parentId}
+        />
+      ) : undefined,
       fetchComponent: () => {
-        if (!mainRoute.asyncComponent && route.component?.fetch) {
-          return route.component.fetch().then(res => {
-            mainRoute.asyncComponent = res.default;
-            if (res.default.loader) {
-              mainRoute.loader = res.default.loader;
-            }
-            return res;
-          });
+        if (route.component?.fetch) {
+          return route.component.fetch();
         } else {
-          return Promise.resolve({ default: React.Fragment });
-        }
-      },
-      fetchLoaderData: arg => {
-        if (mainRoute.loader && !mainRoute.loaderData) {
-          return mainRoute.loader(arg).then(res => {
-            mainRoute.loaderData = res;
-            return res;
-          });
-        } else {
-          return Promise.resolve(mainRoute.loaderData);
+          return Promise.resolve(undefined);
         }
       },
       children: route.routers
         ? loopRoutes(route.routers, id, absPath)
         : undefined
     };
-    mainRoute.element = route.component ? (
-      <RouteComponent mainRoute={mainRoute} />
-    ) : undefined;
     return mainRoute;
   });
 }
 
-function RouteComponent(props: { mainRoute: MainRouteObject }) {
-  const { component, title, access, wrappers, Fallback } = props.mainRoute;
+function RouteComponent(props: MainRouteObject) {
+  const { component, title, wrappers, Fallback, id } = props;
+  const routeMap = useRouteMap();
+  const renderComponent = routeMap.get(id)?.asyncComponent || component;
   React.useEffect(() => {
     if (title) {
       document.title = title;
     }
   });
-  const fallback = Fallback ? React.createElement(Fallback) : "加载中...";
-  const childrenComponent = component
-    ? withError(createWrapperTree(wrappers, component, props))
+  const fallback = Fallback
+    ? React.createElement(Fallback, props as any)
+    : "加载中...";
+  const childrenComponent = renderComponent
+    ? withError(createWrapperTree(wrappers, renderComponent, props))
     : undefined;
   return (
-    <RouteOptionsContext.Provider value={props.mainRoute}>
+    <RouteOptionsContext.Provider value={props}>
       <React.Suspense fallback={fallback}>{childrenComponent}</React.Suspense>
     </RouteOptionsContext.Provider>
   );
