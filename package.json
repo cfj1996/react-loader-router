@@ -11,7 +11,7 @@
     "build": "rollup -c && tsc -b",
     "lint": "eslint --cache .",
     "format": "prettier --ignore-path .eslintignore --write .",
-    "publish": "npm publish --access  ./build/node_modules/react-loader-router",
+    "publish": "npm publish ./build/node_modules/react-loader-router",
     "watch": "rollup -c -w"
   },
   "dependencies": {
