@@ -4,13 +4,14 @@
   "main": "./index.js",
   "module": "./esm/src/index.js",
   "types": "./index.d.ts",
-  "repository": "git@code.aliyun.com:iloveweb1996/react-loader-router.git",
+  "repository": "git@github.com:cfj1996/react-loader-router.git",
   "author": "cfj <iloveweb1996@gmail.com>",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c && tsc -b",
     "lint": "eslint --cache .",
     "format": "prettier --ignore-path .eslintignore --write .",
+    "publish": "npm publish --access  ./build/node_modules/react-loader-router",
     "watch": "rollup -c -w"
   },
   "dependencies": {
