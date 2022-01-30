@@ -1,6 +1,5 @@
-// import { loaderLazy, RouteObject, useRoutes } from "react-loader-router";
 import RootLayout from "./layouts/root";
-import { loaderLazy, RouteObject, useRoutes } from "../../../src";
+import { loaderLazy, RouteObject, useRoutes } from "react-loader-router";
 import { getNavs, getUser, getUsers } from "./server";
 import { createSearchParams } from "react-router-dom";
 import { Loading } from "./Loading";

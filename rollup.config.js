@@ -33,7 +33,7 @@ function reactLoaderRoute() {
       preserveModules: true,
       exports: "auto"
     },
-    external: ["react", "react-router-dom"],
+    external: ["react", "react-router-dom", "swr"],
     plugins: [
       babel({
         exclude: /node_modules/,

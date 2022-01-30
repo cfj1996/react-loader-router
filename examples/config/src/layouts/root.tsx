@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import React from "react";
-import { Link, useLoaderData } from "../../../../src";
+import { Link, useLoaderData } from "react-loader-router";
 import { useSWRConfig } from "swr";
 
 export default function RootLayout() {

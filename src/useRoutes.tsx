@@ -12,7 +12,7 @@ export type LoaderComponentType = React.ComponentType & {
   loader?: Loader;
   fetch?: Fetch;
 };
-export type Fetch = () => Promise<{ default: LoaderComponentType } | undefined>;
+export type Fetch = () => Promise<{ default: LoaderComponentType }>;
 export const RouteOptionsContext = React.createContext<null | MainRouteObject>(
   null
 );
@@ -105,13 +105,7 @@ function loopRoutes(
           parentId={parentId}
         />
       ) : undefined,
-      fetchComponent: () => {
-        if (route.component?.fetch) {
-          return route.component.fetch();
-        } else {
-          return Promise.resolve(undefined);
-        }
-      },
+      fetchComponent: route.component?.fetch,
       children: route.routers
         ? loopRoutes(route.routers, id, absPath)
         : undefined

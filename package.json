@@ -2,7 +2,7 @@
   "name": "react-loader-router",
   "version": "0.0.1",
   "main": "./index.js",
-  "module": "./esm/index.js",
+  "module": "./esm/src/index.js",
   "types": "./index.d.ts",
   "repository": "git@code.aliyun.com:iloveweb1996/react-loader-router.git",
   "author": "cfj <iloveweb1996@gmail.com>",
