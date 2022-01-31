@@ -14,7 +14,6 @@
 
     "skipLibCheck": true,
 
-
     "outDir": "build/node_modules/react-loader-router",
     "rootDir": "src"
   }

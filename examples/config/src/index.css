@@ -1,19 +1,19 @@
-.nav{
-    display: flex;
-    list-style: none;
+.nav {
+  display: flex;
+  list-style: none;
 }
-.nav-item{
-    border: 1px solid red;
-    padding: 5px 10px;
-    margin: 0 15px;
+.nav-item {
+  border: 1px solid red;
+  padding: 5px 10px;
+  margin: 0 15px;
 }
 
-.pagination{
-    display:flex;
-    list-style: none;
+.pagination {
+  display: flex;
+  list-style: none;
 }
-.pagination-item{
-    border: 1px solid red;
-    padding: 5px;
-    margin: 0 10px;
+.pagination-item {
+  border: 1px solid red;
+  padding: 5px;
+  margin: 0 10px;
 }
