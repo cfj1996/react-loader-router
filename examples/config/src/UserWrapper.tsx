@@ -1,10 +1,9 @@
 import React, { FC } from "react";
 import { Navigate } from "react-router-dom";
 import useSWR from "swr";
-import { MainRouteObject } from "../../../src";
 import { getToken } from "./utils/token";
 
-export const UserWrapper: FC<MainRouteObject> = function (props) {
+export const UserWrapper: FC<any> = function (props) {
   const { data } = useSWR("/isLogin", getToken, {
     suspense: true
   });
