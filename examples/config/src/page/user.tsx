@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLoaderData } from "../../../../src";
+import { Link, useLoaderData } from "react-loader-router";
 
 function User() {
   const { data } = useLoaderData();
