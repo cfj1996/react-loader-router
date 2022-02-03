@@ -1,5 +1,5 @@
 {
-  "name": "auth",
+  "name": "config",
   "private": true,
   "scripts": {
     "install_package": "node scripts/install_package.js",
