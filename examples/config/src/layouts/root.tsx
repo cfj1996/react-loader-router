@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import React from "react";
-import { Link, useLoaderData } from "react-loader-router";
+import { Link, useLoaderData } from "../../../../src";
 import { useSWRConfig } from "swr";
 
 export default function RootLayout() {
@@ -16,15 +16,6 @@ export default function RootLayout() {
             </Link>
           </li>
         ))}
-        <li className={"nav-item"}>
-          <button
-            onClick={() => {
-              console.log("cache keys", (cache as Map<string, any>).keys());
-            }}
-          >
-            get cache
-          </button>
-        </li>
       </ul>
 
       <hr />

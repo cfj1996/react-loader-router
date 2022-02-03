@@ -23,6 +23,7 @@ export function getNavs() {
   ]).then(res => deaTime(1500, res));
 }
 export function getUsers(data: { page: string; per_page: string }) {
+  // return deaTime(1500, 1).then(() => Promise.reject(new Error("error")));
   return fetch(
     `https://reqres.in/api/users?page=${data.page}&per_page=${data.per_page}`
   )

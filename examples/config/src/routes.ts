@@ -1,8 +1,10 @@
 import RootLayout from "./layouts/root";
-import { loaderLazy, RouteObject, useRoutes } from "react-loader-router";
+import { loaderLazy, RouteObject, useRoutes } from "../../../src";
 import { getNavs, getUser, getUsers } from "./server";
 import { createSearchParams } from "react-router-dom";
 import { Loading } from "./Loading";
+import { Error } from "./Error";
+import { UserWrapper } from "./UserWrapper";
 
 const routes: RouteObject[] = [
   {
@@ -20,6 +22,7 @@ const routes: RouteObject[] = [
       {
         path: "home",
         title: "首页",
+        wrappers: [UserWrapper],
         component: loaderLazy(() => import("./page/home"))
       },
       {
@@ -30,6 +33,7 @@ const routes: RouteObject[] = [
             title: "用户列表",
             component: loaderLazy(() => import("./page/user")),
             Fallback: Loading,
+            FallbackErr: Error,
             async loader(params) {
               const searchParams = createSearchParams(params?.searchString);
               return await getUsers({
@@ -43,6 +47,7 @@ const routes: RouteObject[] = [
             title: "用户详情",
             component: loaderLazy(() => import("./page/userXq")),
             Fallback: Loading,
+            FallbackErr: Error,
             async loader(params) {
               return await getUser(params?.params?.id || "1");
             }

@@ -32,11 +32,10 @@ export interface RouteObject<T = any> {
   index?: boolean;
   path?: string;
   title?: string;
-  access?: string;
-  wrappers?: React.ComponentType[];
+  wrappers?: React.ComponentType<any>[];
   loader?: Loader<T>;
   Fallback?: React.ComponentType;
-  FallbackErr?: React.ComponentType;
+  FallbackErr?: React.ComponentType<{ error: any }>;
 }
 type RouteMap = Map<
   string,
@@ -90,13 +89,9 @@ function loopRoutes(
       }
     }
     const absPath = resolvePath(route.path || "", parentAbsPath).pathname;
-    const mainRoute: MainRouteObject = {
-      ...route,
-      id,
-      absPath,
-      isLayout,
-      parentId,
-      element: route.component ? (
+    const ErrorBoundary = withError();
+    const element = route.component ? (
+      <ErrorBoundary FallbackErr={route.FallbackErr}>
         <RouteComponent
           {...route}
           id={id}
@@ -104,7 +99,15 @@ function loopRoutes(
           isLayout={isLayout}
           parentId={parentId}
         />
-      ) : undefined,
+      </ErrorBoundary>
+    ) : undefined;
+    const mainRoute: MainRouteObject = {
+      ...route,
+      id,
+      absPath,
+      isLayout,
+      parentId,
+      element,
       fetchComponent: route.component?.fetch,
       children: route.routers
         ? loopRoutes(route.routers, id, absPath)
@@ -115,9 +118,9 @@ function loopRoutes(
 }
 
 function RouteComponent(props: MainRouteObject) {
-  const { component, title, wrappers, Fallback, id } = props;
+  const { component, title, wrappers, Fallback, id, FallbackErr } = props;
   const routeMap = useRouteMap();
-  const renderComponent = routeMap.get(id)?.asyncComponent || component;
+  const renderComponent = routeMap.get(id)?.asyncComponent || component!;
   React.useEffect(() => {
     if (title) {
       document.title = title;
@@ -126,12 +129,10 @@ function RouteComponent(props: MainRouteObject) {
   const fallback = Fallback
     ? React.createElement(Fallback, props as any)
     : "加载中...";
-  const childrenComponent = renderComponent
-    ? withError(createWrapperTree(wrappers, renderComponent, props))
-    : undefined;
+  const children = createWrapperTree(wrappers, renderComponent, props);
   return (
     <RouteOptionsContext.Provider value={props}>
-      <React.Suspense fallback={fallback}>{childrenComponent}</React.Suspense>
+      <React.Suspense fallback={fallback}>{children}</React.Suspense>
     </RouteOptionsContext.Provider>
   );
 }
@@ -139,14 +140,12 @@ function createWrapperTree<T>(
   arr: React.ComponentType[] | undefined,
   Component: React.ComponentType,
   props: T
-): React.ComponentType {
-  return function WrapperTree() {
-    if (arr?.length) {
-      return arr.reduceRight((element, item) => {
-        return React.createElement(item, props, element);
-      }, React.createElement(Component, props));
-    } else {
-      return React.createElement(Component, props);
-    }
-  };
+) {
+  if (arr?.length) {
+    return arr.reduceRight((element, item) => {
+      return React.createElement(item, props, element);
+    }, React.createElement(Component, props));
+  } else {
+    return React.createElement(Component, props);
+  }
 }

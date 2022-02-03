@@ -5,15 +5,16 @@
  * @description:
  */
 
-import type { ComponentType, PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import * as React from "react";
 
-export function withError(component: ComponentType) {
-  class ErrorBoundary extends React.Component<PropsWithChildren<any>> {
+export function withError() {
+  return class ErrorBoundary extends React.Component<
+    PropsWithChildren<{ FallbackErr?: React.ComponentType<any> }>
+  > {
     state = {
       error: null,
-      showError: false,
-      errorComplete: null
+      showError: false
     };
     componentDidCatch(error: any) {
       this.setState({ error });
@@ -21,12 +22,15 @@ export function withError(component: ComponentType) {
     render() {
       const { error } = this.state;
       if (error) {
-        React.createElement(this.props.FallbackErr || "", {
-          error: error
-        });
+        if (this.props.FallbackErr) {
+          return React.createElement(this.props.FallbackErr, {
+            error: error
+          });
+        } else {
+          return <p>页面错误</p>;
+        }
       }
       return this.props.children;
     }
-  }
-  return <ErrorBoundary>{React.createElement(component)}</ErrorBoundary>;
+  };
 }

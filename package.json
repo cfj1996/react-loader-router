@@ -1,6 +1,6 @@
 {
   "name": "react-loader-router",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "./index.js",
   "module": "./esm/src/index.js",
   "types": "./index.d.ts",
@@ -11,7 +11,7 @@
     "build": "rollup -c && tsc -b",
     "lint": "eslint --cache .",
     "format": "prettier --ignore-path .eslintignore --write .",
-    "publish": "npm publish ./build/node_modules/react-loader-router",
+    "publish": "npm publish build/node_modules/react-loader-router",
     "watch": "rollup -c -w"
   },
   "dependencies": {
